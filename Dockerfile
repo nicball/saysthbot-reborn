@@ -1,15 +1,17 @@
-FROM alpine as build
+FROM --platform=$BUILDPLATFORM nixos/nix AS build
 
-ENV RUSTFLAGS="-C target-feature=-crt-static"
 WORKDIR /usr/src/saysthbot
 COPY . .
-RUN apk add --no-cache rustup openssl-dev build-base && rustup-init -y --default-toolchain nightly && source ${HOME}/.cargo/env && cargo build --release
+RUN echo -e "experimental-features = nix-command flakes\nfilter-syscalls = false" >> /etc/nix/nix.conf
+ARG TARGETPLATFORM
+RUN nix build $(if [[ "$TARGETPLATFORM" == linux/arm64 ]]; then echo ".#packages.x86_64-linux.pkgsCross.aarch64-multiplatform.saysthbot-reborn"; fi)
+RUN echo $(readlink -f result) > nix-path && nix copy --to file:///nix-cache/ $(cat nix-path)
 
-FROM alpine
-
-RUN apk add --no-cache ca-certificates openssl libgcc
+FROM nixos/nix
+COPY --from=build /nix-cache /nix-cache
+COPY --from=build /usr/src/saysthbot/nix-path ./
+RUN echo -e "experimental-features = nix-command flakes\nrequire-sigs = false" >> /etc/nix/nix.conf
+RUN nix copy --from file:///nix-cache/ $(cat nix-path)
 ENV TGBOT_TOKEN="" DATABASE_URI="" WRAPPER=""
-CMD ["-c", "${WRAPPER} ./saysthbot-reborn ${OPTIONS}"]
+CMD ["-c", "${WRAPPER} $(cat nix-path)/bin/saysthbot-reborn ${OPTIONS}"]
 ENTRYPOINT [ "/bin/sh" ]
-
-COPY --from=build /usr/src/saysthbot/target/release/saysthbot-reborn ./

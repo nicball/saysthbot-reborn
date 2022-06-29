@@ -5,3 +5,6 @@ target
 README.md
 .github
 .DS_Store
+.dockerignore
+Dockerfile
+result
