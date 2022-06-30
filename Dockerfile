@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM nixos/nix AS build
+FROM --platform=$BUILDPLATFORM nixos/nix:2.9.2 AS build
 
 WORKDIR /usr/src/saysthbot
 COPY . .
