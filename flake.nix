@@ -9,7 +9,7 @@
         pname = "saysthbot-reborn";
         version = "0.1.0";
         src = ./.;
-        RUSTFLAGS = "-C target-feature=-crt-static";
+        # RUSTFLAGS = "-C target-feature=-crt-static";
         cargoLock = { lockFile = ./Cargo.lock; };
         nativeBuildInputs = [ pkg-config ];
         buildInputs = [ openssl ];
