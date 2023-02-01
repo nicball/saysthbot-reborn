@@ -26,6 +26,6 @@ jobs:
           run: |
               nix build .#pkgsCross.aarch64-multiplatform.saysthbot-reborn-docker
               docker load -i result
-              NAME=ghcr.io/${{ github.repository_owner }}/saysthbot-reborn-aarch64:latest
+              NAME=ghcr.io/${{ github.repository_owner }}/saysthbot-reborn:arm-latest
               docker tag saysthbot-reborn:latest $NAME
               docker push $NAME
