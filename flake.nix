@@ -14,14 +14,21 @@
         nativeBuildInputs = [ pkg-config ];
         buildInputs = [ openssl ];
       };
+      packages = pkgs: rec {
+        saysthbot-reborn =
+          pkgs.rustPlatform.buildRustPackage (bot pkgs);
+        saysthbot-reborn-docker =
+          pkgs.dockerTools.buildImage {
+            name = "saysthbot-reborn";
+            tag = "latest";
+            config.Entrypoint = "${saysthbot-reborn}/bin/saysthbot-reborn";
+          };
+      };
     in
     flake-utils.lib.eachDefaultSystem (system: {
-      packages.saysthbot-reborn =
-        with nixpkgs.legacyPackages."${system}";
-        rustPlatform.buildRustPackage (bot pkgs);
-      packages.pkgsCross.aarch64-multiplatform.saysthbot-reborn =
-        with nixpkgs.legacyPackages."${system}".pkgsCross.aarch64-multiplatform;
-        rustPlatform.buildRustPackage (bot pkgs);
+      packages = {
+        pkgsCross.aarch64-multiplatform = packages nixpkgs.legacyPackages."${system}".pkgsCross.aarch64-multiplatform;
+      } // packages nixpkgs.legacyPackages."${system}";
       defaultPackage = self.packages."${system}".saysthbot-reborn;
     });
 }
