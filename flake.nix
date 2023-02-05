@@ -2,10 +2,10 @@
   description = "A telegram bot to record someone's message by forwarding";
 
   inputs.flake-utils.url = "github:numtide/flake-utils";
-  inputs.nixpkgs.url = "nixpkgs/nixos-22.11";
 
   outputs = { self, nixpkgs, flake-utils }:
     let
+      pkg-config = nixpkgs.legacyPackages.x86_64-linux.pkg-config;
       bot = pkgs: with pkgs; {
         pname = "saysthbot-reborn";
         version = "0.1.0";
