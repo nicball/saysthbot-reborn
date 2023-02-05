@@ -19,7 +19,7 @@
         saysthbot-reborn =
           pkgs.rustPlatform.buildRustPackage (bot pkgs);
         saysthbot-reborn-docker =
-          pkgs.dockerTools.buildImage {
+          pkgs.dockerTools.buildLayeredImage {
             name = "saysthbot-reborn";
             tag = "latest";
             config.Entrypoint = "${saysthbot-reborn}/bin/saysthbot-reborn";
